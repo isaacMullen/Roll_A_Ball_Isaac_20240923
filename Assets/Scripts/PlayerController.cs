@@ -5,38 +5,51 @@ using UnityEngine.InputSystem;
 using TMPro;
 public class PlayerController : MonoBehaviour
 {
-    
-    public float gravityMod;
+    public GameObject pickupParent;
+    public LayerMask groundLayer;
     public GameObject winTextObject;
+
+    public float gravityMod;   
+    
     public TextMeshProUGUI countText;
+    
     private int count;
+    int amountOfPoints;
+    
     private Rigidbody rb;
 
     private float movementX;
     private float movementY;
 
     public float speed = 0;
+    public float jumpForce;
+    bool isGrounded = true;  
     
     // Start is called before the first frame update
     void Start()
-    {
-       // Physics.gravity *= gravityMod;
+    {        
+        Physics.gravity *= gravityMod;
+        groundLayer = LayerMask.GetMask("Ground");
+        
+        //Debug.Log(groundLayer);
         
         winTextObject.SetActive(false);
         
         rb = GetComponent<Rigidbody>();
         
         count = 0;
-        SetCountText();
+        SetCountText();      
     }
 
     // Update is called once per frame
     void Update()
     {
-        // if (Input.GetKeyDown(KeyCode.Space))
-        // {
-        //     rb.velocity = new Vector3(0, 100, 0);
-        // }
+        isGrounded = GroundCheck();                        
+        
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
+        {
+            rb.velocity = new Vector3(rb.velocity.x, jumpForce, rb.velocity.z);
+        }        
     }
     void OnMove(InputValue movementValue)
     {
@@ -47,6 +60,7 @@ public class PlayerController : MonoBehaviour
     }
     private void FixedUpdate()
     {
+        
         Vector3 movement = new Vector3 (movementX, 0.0f, movementY);
         
         rb.AddForce(movement * speed);                
@@ -59,14 +73,50 @@ public class PlayerController : MonoBehaviour
             count++;
             SetCountText();
         }
+        if(other.gameObject.CompareTag("Respawn"))
+        {
+            Respawn();
+        }
+        if(other.gameObject.CompareTag("Elevator"))
+        {           
+            transform.SetParent(other.transform, false);
+            Debug.Log("PARENTED TO ELEVATOR");
+        }
+    }
+    private void OnTriggerExit(Collider other)
+    {
+        transform.SetParent(null, false);      
     }
     void SetCountText()
     {
         countText.text = $"Count: {count.ToString()}";
-        if(count >= 6)
+        if(count >= CountChildren(pickupParent))
         {
-            winTextObject.SetActive(true);
-            
+            winTextObject.SetActive(true);            
         }
+    }
+    bool GroundCheck()
+    {
+        RaycastHit hit;
+        
+        if(Physics.Raycast(transform.position, Vector3.down, out hit, .5f, groundLayer))
+        {            
+            return true;
+        }
+        else
+        {
+            return false;
+        }                      
+    }
+    int CountChildren(GameObject gameObject) 
+    {
+        amountOfPoints = gameObject.transform.childCount;
+        return amountOfPoints;
+    }
+    void Respawn()
+    {
+        transform.position = new Vector3(0, .5f, 3.5f);
+        rb.isKinematic = true;        
+        rb.isKinematic = false;
     }
 }
