@@ -3,11 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
+
 public class PlayerController : MonoBehaviour
 {
+    public GameObject elevator;
+    
     public GameObject pickupParent;
+    public GameObject pickupParentTwo;
+    
     public LayerMask groundLayer;
-    public GameObject winTextObject;
+    public LayerMask elevatorLayer;
+    public GameObject continueText;
 
     public float gravityMod;   
     
@@ -28,12 +34,16 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {        
+        elevator.SetActive(false);
+        
+        pickupParentTwo.SetActive(false);
+        
         Physics.gravity *= gravityMod;
         groundLayer = LayerMask.GetMask("Ground");
         
         //Debug.Log(groundLayer);
         
-        winTextObject.SetActive(false);
+        continueText.SetActive(false);
         
         rb = GetComponent<Rigidbody>();
         
@@ -49,7 +59,7 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
             rb.velocity = new Vector3(rb.velocity.x, jumpForce, rb.velocity.z);
-        }        
+        }               
     }
     void OnMove(InputValue movementValue)
     {
@@ -67,6 +77,7 @@ public class PlayerController : MonoBehaviour
     }
     void OnTriggerEnter(Collider other)
     {
+        continueText.SetActive(false);
         if(other.gameObject.CompareTag("PickUp"))
         {
             other.gameObject.SetActive(false);
@@ -79,33 +90,44 @@ public class PlayerController : MonoBehaviour
         }
         if(other.gameObject.CompareTag("Elevator"))
         {           
-            transform.SetParent(other.transform, false);
+            transform.SetParent(other.transform);
             Debug.Log("PARENTED TO ELEVATOR");
         }
     }
     private void OnTriggerExit(Collider other)
     {
-        transform.SetParent(null, false);      
+        transform.SetParent(null);  
+        Debug.Log("UNPARENTED TO ELEVATOR");    
     }
     void SetCountText()
-    {
-        countText.text = $"Count: {count.ToString()}";
+    {        
         if(count >= CountChildren(pickupParent))
         {
-            winTextObject.SetActive(true);            
+            continueText.SetActive(true); 
+            pickupParentTwo.SetActive(true); 
+            elevator.SetActive(true);
+            count = 0;  
+            pickupParent = pickupParentTwo;      
         }
+        countText.text = $"Count: {count.ToString()}/{CountChildren(pickupParent)}";
     }
     bool GroundCheck()
     {
         RaycastHit hit;
         
-        if(Physics.Raycast(transform.position, Vector3.down, out hit, .5f, groundLayer))
-        {            
+        if(Physics.Raycast(transform.position, Vector3.down, out hit, .75f, groundLayer))
+        {                        
+            return true;
+            
+        }
+        else if(Physics.Raycast(transform.position, Vector3.down, out hit, .75f, elevatorLayer))
+        {
             return true;
         }
         else
-        {
+        {            
             return false;
+            
         }                      
     }
     int CountChildren(GameObject gameObject) 
