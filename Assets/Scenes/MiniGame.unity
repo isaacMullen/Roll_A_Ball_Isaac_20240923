@@ -2525,7 +2525,7 @@ GameObject:
   - component: {fileID: 1096385003}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2667,6 +2667,8 @@ MonoBehaviour:
   continueText: {fileID: 1096117854}
   gravityMod: 4
   countText: {fileID: 985611869}
+  projectilePrefab: {fileID: 911277022379417671, guid: dc2b553c2c2bf4247b4465a5fe742058,
+    type: 3}
   speed: 300
   jumpForce: 15
 --- !u!114 &1096385004

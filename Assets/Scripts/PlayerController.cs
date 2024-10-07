@@ -19,7 +19,8 @@ public class PlayerController : MonoBehaviour
     
     public TextMeshProUGUI countText;
     
-    
+    public GameObject projectilePrefab;
+
     private int count;
     int amountOfPoints;
     
@@ -66,7 +67,7 @@ public class PlayerController : MonoBehaviour
 
         isGrounded = GroundCheck();                        
         
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded && pauseMenu.activeInHierarchy == false)
         {
             rb.velocity = new Vector3(rb.velocity.x, jumpForce, rb.velocity.z);
         }               
@@ -150,5 +151,14 @@ public class PlayerController : MonoBehaviour
         transform.position = new Vector3(0, .5f, 3.5f);
         rb.isKinematic = true;        
         rb.isKinematic = false;
+    }
+    void OnFire()
+    {
+        
+        FireProjectile();
+    }
+    void FireProjectile()
+    {
+        Instantiate(projectilePrefab, new Vector3(transform.position.x, transform.position.y, transform.position.z), Quaternion.identity);
     }
 }
