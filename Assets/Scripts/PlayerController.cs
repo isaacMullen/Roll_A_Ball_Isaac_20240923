@@ -19,6 +19,7 @@ public class PlayerController : MonoBehaviour
     
     public TextMeshProUGUI countText;
     
+    
     private int count;
     int amountOfPoints;
     
@@ -29,11 +30,15 @@ public class PlayerController : MonoBehaviour
 
     public float speed = 0;
     public float jumpForce;
-    bool isGrounded = true;  
+    bool isGrounded = true;
+
+    GameObject pauseMenu;
     
     // Start is called before the first frame update
-    void Start()
-    {        
+    void Awake()
+    {
+        pauseMenu = GameObject.FindGameObjectWithTag("PauseMenu");
+
         elevator.SetActive(false);
         
         pickupParentTwo.SetActive(false);
@@ -54,6 +59,11 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            pauseMenu.SetActive(true);
+        }
+
         isGrounded = GroundCheck();                        
         
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
