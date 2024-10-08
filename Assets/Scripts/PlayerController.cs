@@ -154,8 +154,11 @@ public class PlayerController : MonoBehaviour
     }
     void OnFire()
     {
+        if(!pauseMenu.activeInHierarchy)
+        {
+            FireProjectile();
+        }
         
-        FireProjectile();
     }
     void FireProjectile()
     {
