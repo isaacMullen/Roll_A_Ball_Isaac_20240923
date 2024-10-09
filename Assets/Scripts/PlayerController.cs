@@ -6,10 +6,14 @@ using TMPro;
 
 public class PlayerController : MonoBehaviour
 {
-    public GameObject elevator;
+    public GameObject magazine;
+    MagazineSize magazineSize;
     
-    public GameObject pickupParent;
-    public GameObject pickupParentTwo;
+    public GameObject elevator;
+    Vector3 previousPlatformPosition;
+    Vector3 currentPlatformVelocity;
+    
+    public GameObject pickupParent; 
     
     public LayerMask groundLayer;
     public LayerMask elevatorLayer;
@@ -21,7 +25,7 @@ public class PlayerController : MonoBehaviour
     
     public GameObject projectilePrefab;
 
-    private int count;
+    public int count;
     int amountOfPoints;
     
     private Rigidbody rb;
@@ -40,21 +44,22 @@ public class PlayerController : MonoBehaviour
     {
         pauseMenu = GameObject.FindGameObjectWithTag("PauseMenu");
 
-        elevator.SetActive(false);
-        
-        pickupParentTwo.SetActive(false);
+        elevator.SetActive(false);            
         
         Physics.gravity *= gravityMod;
-        groundLayer = LayerMask.GetMask("Ground");
-        
-        //Debug.Log(groundLayer);
+        groundLayer = LayerMask.GetMask("Ground");            
         
         continueText.SetActive(false);
         
         rb = GetComponent<Rigidbody>();
         
         count = 0;
-        SetCountText();      
+        SetCountText();               
+    }
+    private void Start()
+    {
+        previousPlatformPosition = elevator.transform.Find("Collider").transform.position;
+        magazineSize = magazine.GetComponent<MagazineSize>();
     }
 
     // Update is called once per frame
@@ -70,7 +75,8 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded && pauseMenu.activeInHierarchy == false)
         {
             rb.velocity = new Vector3(rb.velocity.x, jumpForce, rb.velocity.z);
-        }               
+        }
+             
     }
     void OnMove(InputValue movementValue)
     {
@@ -84,24 +90,25 @@ public class PlayerController : MonoBehaviour
         
         Vector3 movement = new Vector3 (movementX, 0.0f, movementY);
         
-        rb.AddForce(movement * speed);                
+        rb.AddForce(movement * speed);
+
+        //Getting velocity of the platform using transforms instead of rigidbody
+        currentPlatformVelocity = (elevator.transform.Find("Collider").transform.position - previousPlatformPosition) / Time.deltaTime;
+        //Updating the position of the platform
+        previousPlatformPosition = elevator.transform.Find("Collider").transform.position;
     }
     void OnTriggerEnter(Collider other)
     {
-        continueText.SetActive(false);
-        if(other.gameObject.CompareTag("PickUp"))
-        {
-            other.gameObject.SetActive(false);
-            count++;
-            SetCountText();
-        }
+             
         if(other.gameObject.CompareTag("Respawn"))
         {
             Respawn();
         }
         if(other.gameObject.CompareTag("Elevator"))
-        {           
+        {
+            rb.velocity = rb.velocity - currentPlatformVelocity;
             transform.SetParent(other.transform);
+            continueText.SetActive(false);
             Debug.Log("PARENTED TO ELEVATOR");
         }
     }
@@ -110,15 +117,14 @@ public class PlayerController : MonoBehaviour
         transform.SetParent(null);  
         Debug.Log("UNPARENTED TO ELEVATOR");    
     }
-    void SetCountText()
-    {        
-        if(count >= CountChildren(pickupParent))
+    
+    public void SetCountText()
+    {
+        //If all objects are picked up
+        if (count >= 3 && elevator.activeInHierarchy == false)
         {
-            continueText.SetActive(true); 
-            pickupParentTwo.SetActive(true); 
             elevator.SetActive(true);
-            count = 0;  
-            pickupParent = pickupParentTwo;      
+            continueText.SetActive(true);
         }
         countText.text = $"Count: {count.ToString()}/{CountChildren(pickupParent)}";
     }
@@ -153,12 +159,14 @@ public class PlayerController : MonoBehaviour
         rb.isKinematic = false;
     }
     void OnFire()
-    {
+    {        
         
-        FireProjectile();
+        if(!pauseMenu.activeInHierarchy && magazineSize.bulletsRemaining > 0 && magazineSize.reload == 2) 
+            FireProjectile();
     }
     void FireProjectile()
     {
         Instantiate(projectilePrefab, new Vector3(transform.position.x, transform.position.y, transform.position.z), Quaternion.identity);
+        magazineSize.bulletsRemaining--;
     }
 }
