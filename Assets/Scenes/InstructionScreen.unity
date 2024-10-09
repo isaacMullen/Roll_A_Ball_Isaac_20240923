@@ -800,8 +800,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: These are Dummy Instructions to determine where or not it is properly formatted,
-    Will fix content later once it is all setup.
+  m_text: These are Dummy Instructions to determine whether or not it is working
+    properly, Will fix content and color once it is all setup.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
