@@ -51,8 +51,7 @@ public class MagazineSize : MonoBehaviour
                 reload = 2;
                 bulletsRemaining = magazineSize;
             }
-        }
-        Debug.Log(reload);
+        }        
     }
     void UpdateBulletText(int bullets)
     {

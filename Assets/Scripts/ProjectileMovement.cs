@@ -44,7 +44,7 @@ public class ProjectileMovement : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {                
         rb.velocity = movementDirection * speed * Time.deltaTime;
 
@@ -64,9 +64,16 @@ public class ProjectileMovement : MonoBehaviour
     {
         if (other.gameObject.CompareTag("PickUp"))
         {
+            
             other.gameObject.SetActive(false);
             playerScript.count += 1;
             playerScript.SetCountText();
+            
+            if(playerScript.ArePointsCollected())
+            {
+                Debug.Log("ALL POINTS COLLECTED");
+            }            
+            
             Debug.Log(playerScript.count);
             
         }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
+using System;
 
 public class PlayerController : MonoBehaviour
 {
@@ -13,7 +14,8 @@ public class PlayerController : MonoBehaviour
     Vector3 previousPlatformPosition;
     Vector3 currentPlatformVelocity;
     
-    public GameObject pickupParent; 
+    GameObject pickupParent;
+    public GameObject[] pickupInstances;
     
     public LayerMask groundLayer;
     public LayerMask elevatorLayer;
@@ -53,18 +55,59 @@ public class PlayerController : MonoBehaviour
         
         rb = GetComponent<Rigidbody>();
         
+        
+        
+
+        pickupInstances = GameObject.FindGameObjectsWithTag("PickUpParent");
+        System.Array.Sort(pickupInstances, (a, b) => a.name.CompareTo(b.name));
+
+        foreach(var pickupInstance in pickupInstances)
+        {
+            Debug.Log(pickupInstance.name);
+        }
+
+        foreach(GameObject pickup in  pickupInstances)
+        {
+            pickup.SetActive(false);
+        }
+        ActivateNextPickup();
         count = 0;
-        SetCountText();               
+        SetCountText();
+
     }
+    
     private void Start()
     {
         previousPlatformPosition = elevator.transform.Find("Collider").transform.position;
-        magazineSize = magazine.GetComponent<MagazineSize>();
+        magazineSize = magazine.GetComponent<MagazineSize>();        
     }
 
+    public void ActivateNextPickup()
+    {
+        
+        foreach (GameObject pickup in pickupInstances)
+        {
+            if (count >= CountChildren(pickup) && pickup.activeInHierarchy)
+            {
+                Destroy(pickup);
+                count = 0;
+            }
+            Debug.Log("Checking " + pickup.name + " | Active: " + pickup.activeInHierarchy);
+            if (!pickup.activeInHierarchy)
+            { 
+                pickupParent = pickup;  
+                pickup.SetActive(true);
+                Debug.Log(pickup.name + " has been set to active.");
+                break;
+            }            
+        }        
+    }
+    
     // Update is called once per frame
     void Update()
     {
+        //ArePointsCollected();
+        
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             pauseMenu.SetActive(true);
@@ -113,16 +156,56 @@ public class PlayerController : MonoBehaviour
         }
     }
     private void OnTriggerExit(Collider other)
-    {
-        transform.SetParent(null);  
-        Debug.Log("UNPARENTED TO ELEVATOR");    
+    {        
+        if(other.gameObject.CompareTag("Elevator"))
+        {
+            transform.SetParent(null);
+            Debug.Log("UNPARENTED TO ELEVATOR");
+        }
+              
     }
+    
+    //CHECKING IF ALL POINTS ARE COLLECTED. CALLED IN THE ProjectileMovement SCRIPT
+    public bool ArePointsCollected()
+    {
+        try
+        {
+            if(CountChildren(pickupParent) != 0)
+            {
+                if (count >= CountChildren(pickupParent))
+                {
+                    ActivateNextPickup();                                                            
+                    return true;
+
+                }
+               
+                else
+                {                    
+                    return false;
+                }                
+            }
+            else
+            {
+                pickupParent = GameObject.FindWithTag("PickUpParent");
+                pickupParent.SetActive(true);
+                //IF THE COUNT CHILDREN IS NOT 0 IT RETURNS TRUE
+                return true;
+            }
+                       
+        }
+        catch(MissingReferenceException)
+        {
+            Debug.Log("No PickUps in Scene");
+            return true;
+        }        
+    }
+    
     
     public void SetCountText()
     {
-        //If all objects are picked up
-        if (count >= 3 && elevator.activeInHierarchy == false)
-        {
+        //if all objects are picked up ACTIVATING ELEVATOR
+        if (ArePointsCollected() && elevator.activeInHierarchy == false)
+        {                        
             elevator.SetActive(true);
             continueText.SetActive(true);
         }
@@ -150,6 +233,7 @@ public class PlayerController : MonoBehaviour
     int CountChildren(GameObject gameObject) 
     {
         amountOfPoints = gameObject.transform.childCount;
+
         return amountOfPoints;
     }
     void Respawn()
