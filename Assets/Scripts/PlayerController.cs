@@ -83,24 +83,25 @@ public class PlayerController : MonoBehaviour
     }
 
     public void ActivateNextPickup()
-    {
-        
+    {                
         foreach (GameObject pickup in pickupInstances)
         {
             if (count >= CountChildren(pickup) && pickup.activeInHierarchy)
-            {
+            {                                  
                 Destroy(pickup);
-                count = 0;
+                count = 0;                                    
             }
-            Debug.Log("Checking " + pickup.name + " | Active: " + pickup.activeInHierarchy);
-            if (!pickup.activeInHierarchy)
-            { 
-                pickupParent = pickup;  
+            
+            if (!pickup.activeInHierarchy) 
+            {
+                pickupParent = pickup;
                 pickup.SetActive(true);
                 Debug.Log(pickup.name + " has been set to active.");
                 break;
-            }            
-        }        
+            }
+        }
+              
+                
     }
     
     // Update is called once per frame
@@ -173,10 +174,9 @@ public class PlayerController : MonoBehaviour
             if(CountChildren(pickupParent) != 0)
             {
                 if (count >= CountChildren(pickupParent))
-                {
+                {                    
                     ActivateNextPickup();                                                            
                     return true;
-
                 }
                
                 else
@@ -211,6 +211,7 @@ public class PlayerController : MonoBehaviour
         }
         countText.text = $"Count: {count.ToString()}/{CountChildren(pickupParent)}";
     }
+    
     bool GroundCheck()
     {
         RaycastHit hit;

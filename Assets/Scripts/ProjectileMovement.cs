@@ -64,18 +64,18 @@ public class ProjectileMovement : MonoBehaviour
     {
         if (other.gameObject.CompareTag("PickUp"))
         {
-            
-            other.gameObject.SetActive(false);
             playerScript.count += 1;
+            Debug.Log(playerScript.count);
             playerScript.SetCountText();
+            other.gameObject.SetActive(false);            
             
-            if(playerScript.ArePointsCollected())
-            {
+
+            if (playerScript.ArePointsCollected())
+            {               
                 Debug.Log("ALL POINTS COLLECTED");
             }            
             
-            Debug.Log(playerScript.count);
-            
+                      
         }
     }
 }
