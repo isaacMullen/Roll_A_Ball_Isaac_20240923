@@ -3,19 +3,24 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class CameraController : MonoBehaviour
-{
+{     
+
+
     public GameObject player;
-    private Vector3 offset;
+    private Quaternion initialRotation;
+
+    public Vector3 offset;
     
     // Start is called before the first frame update
     void Start()
     {
-        offset = transform.position - player.transform.position;
+        initialRotation = transform.rotation;
     }
 
     // Update is called once per frame
     void LateUpdate()
-    {
+    {       
         transform.position = player.transform.position + offset;
+        transform.rotation = initialRotation;
     }
 }

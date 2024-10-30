@@ -60,22 +60,5 @@ public class ProjectileMovement : MonoBehaviour
         //Getting distance between projectile and player so i can destroy projectile
         return Vector3.Distance(transform.position, player.transform.position);
     }
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.gameObject.CompareTag("PickUp"))
-        {
-            playerScript.count += 1;
-            Debug.Log(playerScript.count);
-            playerScript.SetCountText();
-            other.gameObject.SetActive(false);            
-            
-
-            if (playerScript.ArePointsCollected())
-            {               
-                Debug.Log("ALL POINTS COLLECTED");
-            }            
-            
-                      
-        }
-    }
+    
 }

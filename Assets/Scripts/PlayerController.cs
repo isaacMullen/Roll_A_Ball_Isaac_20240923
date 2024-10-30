@@ -4,9 +4,15 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
 using System;
+using UnityEngine.AI;
+using System.Collections.Specialized;
 
 public class PlayerController : MonoBehaviour
 {
+    GameObject raycastHitObject;
+
+    public Transform gunPoint;
+    
     public GameObject magazine;
     MagazineSize magazineSize;
     
@@ -26,6 +32,8 @@ public class PlayerController : MonoBehaviour
     public TextMeshProUGUI countText;
     
     public GameObject projectilePrefab;
+    GameObject projectile;
+    public float projectileSpeed;
 
     public int count;
     int amountOfPoints;
@@ -35,11 +43,14 @@ public class PlayerController : MonoBehaviour
     private float movementX;
     private float movementY;
 
+    //PLAYER MOVE SPEED
     public float speed = 0;
     public float jumpForce;
     bool isGrounded = true;
 
     GameObject pauseMenu;
+
+    int pointsToCollect;
     
     // Start is called before the first frame update
     void Awake()
@@ -72,7 +83,7 @@ public class PlayerController : MonoBehaviour
         }
         ActivateNextPickup();
         count = 0;
-        SetCountText();
+        int pointsToCollect = CountChildren(GameObject.FindWithTag("PickUpParent"));
 
     }
     
@@ -83,57 +94,64 @@ public class PlayerController : MonoBehaviour
     }
 
     public void ActivateNextPickup()
-    {                
+    {                       
+        
         foreach (GameObject pickup in pickupInstances)
         {
-            if (count >= CountChildren(pickup) && pickup.activeInHierarchy)
+            if (count >= pointsToCollect && pickup.activeInHierarchy)
             {                                  
                 Destroy(pickup);
-                count = 0;                                    
+                count = 0;
+                Debug.Log(CountChildren(pickup));
+                pointsToCollect = CountChildren(pickup);
             }
             
             if (!pickup.activeInHierarchy) 
             {
-                pickupParent = pickup;
+                pickupParent = pickup;                
                 pickup.SetActive(true);
+                pointsToCollect = CountChildren(pickup);
                 Debug.Log(pickup.name + " has been set to active.");
+                SetCountText(CountChildren(pickupParent));
                 break;
             }
         }
-              
-                
+               
+
+
     }
     
     // Update is called once per frame
     void Update()
-    {
-        //ArePointsCollected();
-        
+    {       
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             pauseMenu.SetActive(true);
         }
 
-        isGrounded = GroundCheck();                        
-        
+        isGrounded = GroundCheck();
+
+        //OLD MOVEMENT--------------------------------
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded && pauseMenu.activeInHierarchy == false)
         {
             rb.velocity = new Vector3(rb.velocity.x, jumpForce, rb.velocity.z);
         }
-             
+
     }
+    //OLD MOVEMENT--------------------------------
     void OnMove(InputValue movementValue)
     {
         Vector2 movementVector = movementValue.Get<Vector2>();
 
-        movementX = movementVector.x; 
-        movementY = movementVector.y; 
+        movementX = movementVector.x;
+        movementY = movementVector.y;
     }
     private void FixedUpdate()
     {
-        
-        Vector3 movement = new Vector3 (movementX, 0.0f, movementY);
-        
+
+        //OLD MOVEMENT--------------------------------
+        Vector3 movement = new Vector3(movementX, 0.0f, movementY);
+
         rb.AddForce(movement * speed);
 
         //Getting velocity of the platform using transforms instead of rigidbody
@@ -173,7 +191,7 @@ public class PlayerController : MonoBehaviour
         {
             if(CountChildren(pickupParent) != 0)
             {
-                if (count >= CountChildren(pickupParent))
+                if (count >= pointsToCollect)
                 {                    
                     ActivateNextPickup();                                                            
                     return true;
@@ -201,7 +219,7 @@ public class PlayerController : MonoBehaviour
     }
     
     
-    public void SetCountText()
+    public void SetCountText(int children)
     {
         //if all objects are picked up ACTIVATING ELEVATOR
         if (ArePointsCollected() && elevator.activeInHierarchy == false)
@@ -209,7 +227,7 @@ public class PlayerController : MonoBehaviour
             elevator.SetActive(true);
             continueText.SetActive(true);
         }
-        countText.text = $"Count: {count.ToString()}/{CountChildren(pickupParent)}";
+        countText.text = $"Count: {count.ToString()}/{children}";
     }
     
     bool GroundCheck()
@@ -231,7 +249,7 @@ public class PlayerController : MonoBehaviour
             
         }                      
     }
-    int CountChildren(GameObject gameObject) 
+    public int CountChildren(GameObject gameObject) 
     {
         amountOfPoints = gameObject.transform.childCount;
 
@@ -251,7 +269,51 @@ public class PlayerController : MonoBehaviour
     }
     void FireProjectile()
     {
-        Instantiate(projectilePrefab, new Vector3(transform.position.x, transform.position.y, transform.position.z), Quaternion.identity);
+        Shoot();
         magazineSize.bulletsRemaining--;
+    }
+
+    void Shoot()
+    {
+        Camera cam = Camera.main;
+        Vector3 cameraPosition = cam.transform.position;
+
+        Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+
+        Vector3 targetPoint;
+
+        if(Physics.Raycast(ray, out RaycastHit hit))
+        {
+            targetPoint = hit.point;
+        }
+        else
+        {
+            targetPoint = ray.GetPoint(1000);
+        }
+
+        Vector3 direction = (targetPoint - gunPoint.position).normalized;
+        projectile = Instantiate(projectilePrefab, gunPoint.position, Quaternion.identity);
+
+        Rigidbody proRb = projectile.GetComponent<Rigidbody>();
+        proRb.velocity = direction * projectileSpeed;
+
+        try
+        {
+            raycastHitObject = hit.collider.gameObject;
+            if (raycastHitObject.CompareTag("PickUp"))
+            {
+
+                Debug.Log("HIT PICKUP");
+                count += 1;
+                SetCountText(pointsToCollect);
+                Destroy(raycastHitObject);
+            }
+        }
+        catch(NullReferenceException)
+        {
+            Debug.Log("NO OBJECT HIT");
+        }
+
+        
     }
 }
