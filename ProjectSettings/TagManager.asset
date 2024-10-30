@@ -8,6 +8,7 @@ TagManager:
   - Elevator
   - PauseMenu
   - PickUpParent
+  - Target
   layers:
   - Default
   - TransparentFX
