@@ -9,6 +9,8 @@ using System.Collections.Specialized;
 
 public class PlayerController : MonoBehaviour
 {
+    public Transform cameraTransform;
+    
     //TIMER STUFF
     public TextMeshProUGUI timerText;
     float timer;
@@ -197,7 +199,7 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
 
-        //OLD MOVEMENT--------------------------------
+        
         Vector3 movement = new Vector3(movementX, 0.0f, movementY);
 
         rb.AddForce(movement * speed);
