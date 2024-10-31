@@ -9,6 +9,9 @@ using System.Collections.Specialized;
 
 public class PlayerController : MonoBehaviour
 {
+    AudioSource audioSource;
+    public AudioClip clip;
+    
     GameObject raycastHitObject;
 
     public Transform gunPoint;
@@ -66,6 +69,7 @@ public class PlayerController : MonoBehaviour
         
         rb = GetComponent<Rigidbody>();
         
+        audioSource = GetComponent<AudioSource>();
         
         
 
@@ -293,6 +297,9 @@ public class PlayerController : MonoBehaviour
 
         Vector3 direction = (targetPoint - gunPoint.position).normalized;
         projectile = Instantiate(projectilePrefab, gunPoint.position, Quaternion.identity);
+        //PLAYSOUND HERE---------------------------------------
+        //audioSource.Play();
+
 
         Rigidbody proRb = projectile.GetComponent<Rigidbody>();
         proRb.velocity = direction * projectileSpeed;
