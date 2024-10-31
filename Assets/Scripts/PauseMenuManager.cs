@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PauseMenuManager : MonoBehaviour
 {
+    public GameObject crosshair;
+    
     GameObject pauseMenu;
 
     // Start is called before the first frame update
@@ -23,11 +25,14 @@ public class PauseMenuManager : MonoBehaviour
     }
     public void PauseGame()
     {      
+        crosshair.SetActive(false);
         Time.timeScale = 0;       
     }
     public void ResumeGame()
     {
         Time.timeScale = 1;
+        crosshair.SetActive(true);
+        Cursor.visible = false;
     }
     public void OnResumeButton()
     {

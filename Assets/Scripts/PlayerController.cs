@@ -9,6 +9,10 @@ using System.Collections.Specialized;
 
 public class PlayerController : MonoBehaviour
 {
+    //TIMER STUFF
+    public TextMeshProUGUI timerText;
+    float timer;
+
     AudioSource audioSource;
     public AudioClip clip;
     
@@ -48,13 +52,20 @@ public class PlayerController : MonoBehaviour
 
     //PLAYER MOVE SPEED
     public float speed = 0;
+    float baseSpeed;
+    public float sprintMod;
     public float jumpForce;
     bool isGrounded = true;
 
     GameObject pauseMenu;
 
-    int pointsToCollect;
     
+
+    //SLOW TIME VARIABLES
+    float slowTimeLength = 5;
+    bool timeIsSlowed;
+
+    int pointsToCollect;
     // Start is called before the first frame update
     void Awake()
     {
@@ -94,7 +105,9 @@ public class PlayerController : MonoBehaviour
     private void Start()
     {
         previousPlatformPosition = elevator.transform.Find("Collider").transform.position;
-        magazineSize = magazine.GetComponent<MagazineSize>();        
+        magazineSize = magazine.GetComponent<MagazineSize>();
+
+        baseSpeed = speed;
     }
 
     public void ActivateNextPickup()
@@ -127,9 +140,29 @@ public class PlayerController : MonoBehaviour
     
     // Update is called once per frame
     void Update()
-    {       
+    {
+        //Timer
+        //Rounding to 2 decimal places and displaying them
+        timerText.SetText((Mathf.Round(timer * 100) / 100).ToString("F2"));
+        timer += Time.deltaTime;
+        
+        if(timeIsSlowed && slowTimeLength > 0)
+        { 
+            slowTimeLength -= Time.deltaTime;
+        }
+        else if(slowTimeLength <= 0 && timeIsSlowed)
+        {
+            Time.timeScale = 1f;
+            timeIsSlowed = false;
+        }
+
+
+        speed = baseSpeed;
+        Debug.Log(speed);
+        
         if (Input.GetKeyDown(KeyCode.Escape))
         {
+            //_-----------------------------------------------------------------------------------------------
             pauseMenu.SetActive(true);
         }
 
@@ -140,6 +173,17 @@ public class PlayerController : MonoBehaviour
         {
             rb.velocity = new Vector3(rb.velocity.x, jumpForce, rb.velocity.z);
         }
+        if(Input.GetKey(KeyCode.LeftShift))
+        {
+            speed = baseSpeed + sprintMod;
+            Debug.Log(speed);
+        }
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            Time.timeScale = .5f;
+            timeIsSlowed = true;
+        }
+        
 
     }
     //OLD MOVEMENT--------------------------------
@@ -170,7 +214,11 @@ public class PlayerController : MonoBehaviour
         {
             Respawn();
         }
-        if(other.gameObject.CompareTag("Elevator"))
+        if (other.gameObject.CompareTag("PickUp"))
+        {
+            Debug.Log("HIT TARGET");
+        }
+        if (other.gameObject.CompareTag("Elevator"))
         {
             rb.velocity = rb.velocity - currentPlatformVelocity;
             transform.SetParent(other.transform);
