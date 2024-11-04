@@ -121,8 +121,8 @@ public class PlayerController : MonoBehaviour
             {                                  
                 Destroy(pickup);
                 count = 0;
-                Debug.Log(CountChildren(pickup));
-                pointsToCollect = CountChildren(pickup);
+                //Debug.Log($"children: {CountChildren(pickup)}");
+                
             }
             
             if (!pickup.activeInHierarchy) 
@@ -130,8 +130,10 @@ public class PlayerController : MonoBehaviour
                 pickupParent = pickup;                
                 pickup.SetActive(true);
                 pointsToCollect = CountChildren(pickup);
+                Debug.Log($"CHILDREN: {pointsToCollect}");
                 Debug.Log(pickup.name + " has been set to active.");
-                SetCountText(CountChildren(pickupParent));
+                SetCountText(pointsToCollect);
+
                 break;
             }
         }
@@ -158,7 +160,8 @@ public class PlayerController : MonoBehaviour
             timeIsSlowed = false;
         }
 
-
+        
+        
         speed = baseSpeed;
         Debug.Log(speed);
         
@@ -171,12 +174,14 @@ public class PlayerController : MonoBehaviour
         isGrounded = GroundCheck();
 
         //OLD MOVEMENT--------------------------------
+        bool isSprinting = Input.GetKey(KeyCode.LeftShift);
+
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded && pauseMenu.activeInHierarchy == false)
         {
             rb.velocity = new Vector3(rb.velocity.x, jumpForce, rb.velocity.z);
         }
-        if(Input.GetKey(KeyCode.LeftShift))
-        {
+        if(isSprinting)
+        {            
             speed = baseSpeed + sprintMod;
             Debug.Log(speed);
         }
@@ -259,7 +264,7 @@ public class PlayerController : MonoBehaviour
             else
             {
                 pickupParent = GameObject.FindWithTag("PickUpParent");
-                pickupParent.SetActive(true);
+                pickupParent.SetActive(true);               
                 //IF THE COUNT CHILDREN IS NOT 0 IT RETURNS TRUE
                 return true;
             }
@@ -365,6 +370,7 @@ public class PlayerController : MonoBehaviour
                 SetCountText(pointsToCollect);
                 Destroy(raycastHitObject);
             }
+            SetCountText(pointsToCollect);
         }
         catch(NullReferenceException)
         {
