@@ -9,6 +9,7 @@ TagManager:
   - PauseMenu
   - PickUpParent
   - Target
+  - LastWall
   layers:
   - Default
   - TransparentFX

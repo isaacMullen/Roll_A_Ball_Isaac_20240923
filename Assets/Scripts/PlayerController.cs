@@ -6,9 +6,18 @@ using TMPro;
 using System;
 using UnityEngine.AI;
 using System.Collections.Specialized;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
+    bool secondStageFirstLevel;
+    
+    public GameObject lastWall;
+    
+    public GameObject finishedText;
+    
+    public GameObject secondStretch;
+    
     public Transform cameraTransform;
     
     //TIMER STUFF
@@ -71,10 +80,15 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Awake()
     {
-        pauseMenu = GameObject.FindGameObjectWithTag("PauseMenu");
+        secondStageFirstLevel = false;
 
-        elevator.SetActive(false);            
+
+        finishedText.SetActive(false);
         
+        pauseMenu = GameObject.FindGameObjectWithTag("PauseMenu");
+        
+        elevator.SetActive(false);
+                                    
         Physics.gravity *= gravityMod;
         groundLayer = LayerMask.GetMask("Ground");            
         
@@ -87,6 +101,10 @@ public class PlayerController : MonoBehaviour
         
 
         pickupInstances = GameObject.FindGameObjectsWithTag("PickUpParent");
+        foreach(GameObject p in pickupInstances)
+        {
+            Debug.Log("ITEM");
+        }
         System.Array.Sort(pickupInstances, (a, b) => a.name.CompareTo(b.name));
 
         foreach(var pickupInstance in pickupInstances)
@@ -104,12 +122,15 @@ public class PlayerController : MonoBehaviour
 
     }
     
+    
     private void Start()
     {
         previousPlatformPosition = elevator.transform.Find("Collider").transform.position;
         magazineSize = magazine.GetComponent<MagazineSize>();
 
         baseSpeed = speed;
+
+        secondStretch.SetActive(false);
     }
 
     public void ActivateNextPickup()
@@ -121,8 +142,13 @@ public class PlayerController : MonoBehaviour
             {                                  
                 Destroy(pickup);
                 count = 0;
-                //Debug.Log($"children: {CountChildren(pickup)}");
+                if(SceneManager.GetActiveScene().buildIndex == 3)
+                {
+                    secondStretch.SetActive(true);
+                }
                 
+                //Debug.Log($"children: {CountChildren(pickup)}");
+
             }
             
             if (!pickup.activeInHierarchy) 
@@ -145,6 +171,10 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (SceneManager.GetActiveScene().buildIndex == 2 && count == pointsToCollect && secondStageFirstLevel)
+        {            
+            lastWall.SetActive(false);
+        }
         //Timer
         //Rounding to 2 decimal places and displaying them
         timerText.SetText((Mathf.Round(timer * 100) / 100).ToString("F2"));
@@ -232,6 +262,20 @@ public class PlayerController : MonoBehaviour
             continueText.SetActive(false);
             Debug.Log("PARENTED TO ELEVATOR");
         }
+        if (other.gameObject.CompareTag("Finish") && count == pointsToCollect)
+        {
+            Debug.Log("DONE LEVEL");
+            finishedText.SetActive(true);            
+            if(SceneManager.GetActiveScene().buildIndex + 1 < SceneManager.sceneCountInBuildSettings)
+            {
+                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+            }
+            else
+            {
+                SceneManager.LoadScene(0);
+            }
+            
+        }
     }
     private void OnTriggerExit(Collider other)
     {        
@@ -264,8 +308,9 @@ public class PlayerController : MonoBehaviour
             else
             {
                 pickupParent = GameObject.FindWithTag("PickUpParent");
-                pickupParent.SetActive(true);               
+                pickupParent.SetActive(true);
                 //IF THE COUNT CHILDREN IS NOT 0 IT RETURNS TRUE
+                ActivateNextPickup();
                 return true;
             }
                        
@@ -283,8 +328,13 @@ public class PlayerController : MonoBehaviour
         //if all objects are picked up ACTIVATING ELEVATOR
         if (ArePointsCollected() && elevator.activeInHierarchy == false)
         {                        
-            elevator.SetActive(true);
-            continueText.SetActive(true);
+            //Only set elevator active if its the first level
+            if(SceneManager.GetActiveScene().buildIndex == 2)
+            {
+                elevator.SetActive(true);
+                continueText.SetActive(true);
+                secondStageFirstLevel = true;
+            }            
         }
         countText.text = $"Count: {count.ToString()}/{children}";
     }
@@ -364,11 +414,10 @@ public class PlayerController : MonoBehaviour
             raycastHitObject = hit.collider.gameObject;
             if (raycastHitObject.CompareTag("PickUp"))
             {
-
-                Debug.Log("HIT PICKUP");
+                Destroy(raycastHitObject);               
                 count += 1;
                 SetCountText(pointsToCollect);
-                Destroy(raycastHitObject);
+                
             }
             SetCountText(pointsToCollect);
         }
