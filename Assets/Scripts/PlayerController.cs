@@ -101,10 +101,11 @@ public class PlayerController : MonoBehaviour
         
 
         pickupInstances = GameObject.FindGameObjectsWithTag("PickUpParent");
-        foreach(GameObject p in pickupInstances)
+        
+        /*foreach(GameObject p in pickupInstances)
         {
             Debug.Log("ITEM");
-        }
+        }*/
         System.Array.Sort(pickupInstances, (a, b) => a.name.CompareTo(b.name));
 
         foreach(var pickupInstance in pickupInstances)
