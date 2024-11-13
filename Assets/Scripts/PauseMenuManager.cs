@@ -13,6 +13,7 @@ public class PauseMenuManager : MonoBehaviour
     {
         pauseMenu = GameObject.FindWithTag("PauseMenu");
         pauseMenu.SetActive(false);
+        
     }
 
     // Update is called once per frame
@@ -26,7 +27,8 @@ public class PauseMenuManager : MonoBehaviour
     public void PauseGame()
     {      
         crosshair.SetActive(false);
-        Time.timeScale = 0;       
+        Time.timeScale = 0;
+        Cursor.visible = true;
     }
     public void ResumeGame()
     {

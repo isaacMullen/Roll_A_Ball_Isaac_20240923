@@ -31,32 +31,32 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: b5d153db8a3455445a020d608675de55,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.25
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b5d153db8a3455445a020d608675de55,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 8.409752
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b5d153db8a3455445a020d608675de55,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: -0.70710474
+      value: -0.70710784
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b5d153db8a3455445a020d608675de55,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: 0.0000020861626
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b5d153db8a3455445a020d608675de55,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.7071089
+      value: 0.0000021457672
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b5d153db8a3455445a020d608675de55,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0.7071058
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b5d153db8a3455445a020d608675de55,
         type: 3}
@@ -216,6 +216,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 4857472127761302965}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b5d153db8a3455445a020d608675de55,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7854904660270224141}
   m_SourcePrefab: {fileID: 100100000, guid: b5d153db8a3455445a020d608675de55, type: 3}
 --- !u!1 &8578866107787160027 stripped
 GameObject:
@@ -271,3 +275,21 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.17
   m_Center: {x: 0.02, y: 0, z: 0}
+--- !u!114 &7854904660270224141
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8578866107787160027}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 36a186fa9499f3f4ba98b6b55e399f8c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lastPosition: {x: 0, y: 0, z: 0}
+  speed: 1
+  pointA: {fileID: 0}
+  pointB: {fileID: 0}
+  movingToB: 1
+  progress: 0

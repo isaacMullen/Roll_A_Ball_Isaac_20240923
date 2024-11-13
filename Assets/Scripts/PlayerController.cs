@@ -9,7 +9,7 @@ using System.Collections.Specialized;
 using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
-{
+{           
     bool secondStageFirstLevel;
     
     public GameObject lastWall;
@@ -35,6 +35,7 @@ public class PlayerController : MonoBehaviour
     MagazineSize magazineSize;
     
     public GameObject elevator;
+    
     Vector3 previousPlatformPosition;
     Vector3 currentPlatformVelocity;
     
@@ -131,6 +132,7 @@ public class PlayerController : MonoBehaviour
 
         baseSpeed = speed;
 
+        
         secondStretch.SetActive(false);
     }
 
@@ -172,6 +174,14 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        currentPlatformVelocity = (elevator.transform.Find("Collider").transform.position - previousPlatformPosition) / Time.deltaTime;
+        //Updating the position of the platform
+        previousPlatformPosition = elevator.transform.Find("Collider").transform.position;
+
+        
+
+       // Debug.Log(currentPlatformVelocity);
+        
         if (SceneManager.GetActiveScene().buildIndex == 2 && count == pointsToCollect && secondStageFirstLevel)
         {            
             lastWall.SetActive(false);
@@ -234,16 +244,14 @@ public class PlayerController : MonoBehaviour
     }
     private void FixedUpdate()
     {
+       
 
-        
         Vector3 movement = new Vector3(movementX, 0.0f, movementY);
 
         rb.AddForce(movement * speed);
 
         //Getting velocity of the platform using transforms instead of rigidbody
-        currentPlatformVelocity = (elevator.transform.Find("Collider").transform.position - previousPlatformPosition) / Time.deltaTime;
-        //Updating the position of the platform
-        previousPlatformPosition = elevator.transform.Find("Collider").transform.position;
+        
     }
     void OnTriggerEnter(Collider other)
     {
@@ -257,9 +265,7 @@ public class PlayerController : MonoBehaviour
             Debug.Log("HIT TARGET");
         }
         if (other.gameObject.CompareTag("Elevator"))
-        {
-            rb.velocity = rb.velocity - currentPlatformVelocity;
-            transform.SetParent(other.transform);
+        {            
             continueText.SetActive(false);
             Debug.Log("PARENTED TO ELEVATOR");
         }
@@ -282,7 +288,7 @@ public class PlayerController : MonoBehaviour
     {        
         if(other.gameObject.CompareTag("Elevator"))
         {
-            transform.SetParent(null);
+            transform.SetParent(null);            
             Debug.Log("UNPARENTED TO ELEVATOR");
         }
               
