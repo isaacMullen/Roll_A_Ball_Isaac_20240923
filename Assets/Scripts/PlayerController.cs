@@ -9,7 +9,11 @@ using System.Collections.Specialized;
 using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
-{           
+{
+    public Transform repsawnLocation;
+
+    public TextMeshProUGUI slowTimeAvailableText;
+    
     bool secondStageFirstLevel;
     
     public GameObject lastWall;
@@ -71,14 +75,37 @@ public class PlayerController : MonoBehaviour
 
     GameObject pauseMenu;
 
-    
+    bool slowTimeAvailable;
 
     //SLOW TIME VARIABLES
-    float slowTimeLength = 5;
+    float slowTimeLength = 1f;
     bool timeIsSlowed;
 
     int pointsToCollect;
     // Start is called before the first frame update
+    public int myInteger;
+
+    private void OnEnable()
+    {
+        // Subscribe to the event
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        // Unsubscribe to avoid issues
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // Unity calls this automatically when a scene is loaded
+        Debug.Log($"Scene '{scene.name}' has loaded!");
+        slowTimeAvailable = true; // Reset your variable
+        slowTimeAvailableText.SetText($"Slow Time Available");
+        Debug.Log("Integer reset to: " + slowTimeAvailable);
+    }
+
     void Awake()
     {
         secondStageFirstLevel = false;
@@ -198,6 +225,7 @@ public class PlayerController : MonoBehaviour
         else if(slowTimeLength <= 0 && timeIsSlowed)
         {
             Time.timeScale = 1f;
+            slowTimeLength = 1f;
             timeIsSlowed = false;
         }
 
@@ -226,10 +254,12 @@ public class PlayerController : MonoBehaviour
             speed = baseSpeed + sprintMod;
             Debug.Log(speed);
         }
-        if (Input.GetKeyDown(KeyCode.F))
+        if (Input.GetKeyDown(KeyCode.F) && slowTimeAvailable)
         {
             Time.timeScale = .5f;
             timeIsSlowed = true;
+            slowTimeAvailable = false;
+            slowTimeAvailableText.SetText($"Slow Time Unavailable");
         }
         
 
@@ -256,7 +286,7 @@ public class PlayerController : MonoBehaviour
     }
     void OnTriggerEnter(Collider other)
     {
-             
+        
         if(other.gameObject.CompareTag("Respawn"))
         {
             Respawn();
@@ -374,7 +404,12 @@ public class PlayerController : MonoBehaviour
     }
     void Respawn()
     {
-        transform.position = new Vector3(0, .5f, 3.5f);
+        transform.position = repsawnLocation.position;
+        
+        //Resetting slow time
+        slowTimeAvailable = true;
+        slowTimeAvailableText.SetText("Slow Time Available");
+
         rb.isKinematic = true;        
         rb.isKinematic = false;
     }
