@@ -212,7 +212,7 @@ public class PlayerController : MonoBehaviour
             pauseMenu.SetActive(true);
         }
 
-        isGrounded = GroundCheck();
+        
 
         //OLD MOVEMENT--------------------------------
         bool isSprinting = Input.GetKey(KeyCode.LeftShift);
@@ -244,8 +244,9 @@ public class PlayerController : MonoBehaviour
     }
     private void FixedUpdate()
     {
-       
 
+        isGrounded = GroundCheck();
+        
         Vector3 movement = new Vector3(movementX, 0.0f, movementY);
 
         rb.AddForce(movement * speed);
