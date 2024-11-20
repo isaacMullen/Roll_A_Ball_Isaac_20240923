@@ -10,5 +10,6 @@ Kyle Lirette -
 The game is really well designed, I like the skybox and the mechanics are pretty smooth. After the elevator sequence, when you have the two targets moving back and forth, 
 the higher target is much harder to hit depending on what distance you are from it.
 
-Logan - really good so far shooting feels smooth the targets feel a bit too easy to hit so i would suggest makeing the targets in the second level move a bit.
+Logan - 
+really good so far shooting feels smooth the targets feel a bit too easy to hit so i would suggest makeing the targets in the second level move a bit.
 the elevator has a problem for the jumping where it would seem to jump too late.
