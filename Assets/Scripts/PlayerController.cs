@@ -13,54 +13,56 @@ public class PlayerController : MonoBehaviour
     public Transform repsawnLocation;
 
     public TextMeshProUGUI slowTimeAvailableText;
-    
+
     bool secondStageFirstLevel;
-    
+    public GameObject portal;
+
     public GameObject lastWall;
-    
+
     public GameObject finishedText;
-    
+
     public GameObject secondStretch;
-    
+
     public Transform cameraTransform;
-    
+
     //TIMER STUFF
     public TextMeshProUGUI timerText;
     float timer;
 
     AudioSource audioSource;
     public AudioClip clip;
-    
+
     GameObject raycastHitObject;
 
     public Transform gunPoint;
-    
+
     public GameObject magazine;
     MagazineSize magazineSize;
-    
+
     public GameObject elevator;
-    
+
     Vector3 previousPlatformPosition;
     Vector3 currentPlatformVelocity;
-    
+
     GameObject pickupParent;
     public GameObject[] pickupInstances;
-    
+
     public LayerMask groundLayer;
     public LayerMask elevatorLayer;
     public GameObject continueText;
 
-    public float gravityMod;   
-    
+    public float gravityMod;
+    public static bool gravityHasBeenModified;
+
     public TextMeshProUGUI countText;
-    
+
     public GameObject projectilePrefab;
     GameObject projectile;
     public float projectileSpeed;
 
     public int count;
     int amountOfPoints;
-    
+
     private Rigidbody rb;
 
     private float movementX;
@@ -85,6 +87,17 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     public int myInteger;
 
+    public void ReloadLevel()
+    {
+        string currentScene = SceneManager.GetActiveScene().name;
+        SceneManager.LoadScene(currentScene);
+        rb.velocity = Vector3.zero;
+    }
+    public void QuitGame()
+    {
+        Application.Quit();
+    }
+    
     private void OnEnable()
     {
         // Subscribe to the event
@@ -110,14 +123,19 @@ public class PlayerController : MonoBehaviour
     {
         secondStageFirstLevel = false;
 
-
         finishedText.SetActive(false);
         
         pauseMenu = GameObject.FindGameObjectWithTag("PauseMenu");
         
         elevator.SetActive(false);
                                     
-        Physics.gravity *= gravityMod;
+        
+        if(!gravityHasBeenModified)
+        {
+            Physics.gravity *= gravityMod;
+            gravityHasBeenModified = true;
+        }
+        
         groundLayer = LayerMask.GetMask("Ground");            
         
         continueText.SetActive(false);
@@ -161,6 +179,10 @@ public class PlayerController : MonoBehaviour
 
         
         secondStretch.SetActive(false);
+
+        Debug.Log($"Gravity {Physics.gravity}");
+
+        Time.timeScale = 1;
     }
 
     public void ActivateNextPickup()
@@ -175,6 +197,7 @@ public class PlayerController : MonoBehaviour
                 if(SceneManager.GetActiveScene().buildIndex == 3)
                 {
                     secondStretch.SetActive(true);
+                    portal.SetActive(true);
                 }
                 
                 //Debug.Log($"children: {CountChildren(pickup)}");
@@ -212,6 +235,11 @@ public class PlayerController : MonoBehaviour
         if (SceneManager.GetActiveScene().buildIndex == 2 && count == pointsToCollect && secondStageFirstLevel)
         {            
             lastWall.SetActive(false);
+            if(portal != null)
+            {
+                portal.SetActive(true);
+            }
+
         }
         //Timer
         //Rounding to 2 decimal places and displaying them
@@ -237,7 +265,7 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             //_-----------------------------------------------------------------------------------------------
-            pauseMenu.SetActive(true);
+            pauseMenu.SetActive(true);            
         }
 
         
