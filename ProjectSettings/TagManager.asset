@@ -10,6 +10,7 @@ TagManager:
   - PickUpParent
   - Target
   - LastWall
+  - MuzzleFlash
   layers:
   - Default
   - TransparentFX

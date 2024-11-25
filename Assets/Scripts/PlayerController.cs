@@ -10,6 +10,10 @@ using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
+
+    public GameObject particlesOBJ;
+    public ParticleSystem muzzleFlash;
+    
     public Transform repsawnLocation;
 
     public TextMeshProUGUI slowTimeAvailableText;
@@ -117,10 +121,15 @@ public class PlayerController : MonoBehaviour
         slowTimeAvailable = true; // Reset your variable
         slowTimeAvailableText.SetText($"Slow Time Available");
         Debug.Log("Integer reset to: " + slowTimeAvailable);
+        particlesOBJ = GameObject.Find("MuzzleFlashLocation");
+        muzzleFlash = GameObject.FindObjectOfType<ParticleSystem>();
     }
 
     void Awake()
     {
+        DontDestroyOnLoad(particlesOBJ);
+        DontDestroyOnLoad(muzzleFlash);
+        
         secondStageFirstLevel = false;
 
         finishedText.SetActive(false);
@@ -172,6 +181,8 @@ public class PlayerController : MonoBehaviour
     
     private void Start()
     {
+        DontDestroyOnLoad(muzzleFlash);
+        
         previousPlatformPosition = elevator.transform.Find("Collider").transform.position;
         magazineSize = magazine.GetComponent<MagazineSize>();
 
@@ -444,8 +455,16 @@ public class PlayerController : MonoBehaviour
     void OnFire()
     {        
         
-        if(!pauseMenu.activeInHierarchy && magazineSize.bulletsRemaining > 0 && magazineSize.reload == 2) 
+        if(!pauseMenu.activeInHierarchy && magazineSize.bulletsRemaining > 0 && magazineSize.reload == 2)
+        {
             FireProjectile();
+            if(muzzleFlash != null)
+            {
+                muzzleFlash.Play();
+            }
+            
+        }
+            
     }
     void FireProjectile()
     {
@@ -472,10 +491,7 @@ public class PlayerController : MonoBehaviour
         }
 
         Vector3 direction = (targetPoint - gunPoint.position).normalized;
-        projectile = Instantiate(projectilePrefab, gunPoint.position, Quaternion.identity);
-        //PLAYSOUND HERE---------------------------------------
-        //audioSource.Play();
-
+        projectile = Instantiate(projectilePrefab, gunPoint.position, Quaternion.identity);        
 
         Rigidbody proRb = projectile.GetComponent<Rigidbody>();
         proRb.velocity = direction * projectileSpeed;
