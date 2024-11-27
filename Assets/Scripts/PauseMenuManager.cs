@@ -14,7 +14,7 @@ public class PauseMenuManager : MonoBehaviour
         pauseMenu = GameObject.FindWithTag("PauseMenu");
         pauseMenu.SetActive(false);
 
-        DontDestroyOnLoad(this);
+        //DontDestroyOnLoad(this);
         
     }
 

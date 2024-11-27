@@ -10,6 +10,7 @@ using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
+    public ScoreScreen UImanager;
 
     public GameObject particlesOBJ;
     public ParticleSystem muzzleFlash;
@@ -31,7 +32,7 @@ public class PlayerController : MonoBehaviour
 
     //TIMER STUFF
     public TextMeshProUGUI timerText;
-    float timer;
+    public float timer;
 
     AudioSource audioSource;
     public AudioClip clip;
@@ -117,18 +118,18 @@ public class PlayerController : MonoBehaviour
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         // Unity calls this automatically when a scene is loaded
-        Debug.Log($"Scene '{scene.name}' has loaded!");
+        //Debug.Log($"Scene '{scene.name}' has loaded!");
         slowTimeAvailable = true; // Reset your variable
         slowTimeAvailableText.SetText($"Slow Time Available");
-        Debug.Log("Integer reset to: " + slowTimeAvailable);
+        //Debug.Log("Integer reset to: " + slowTimeAvailable);
         particlesOBJ = GameObject.Find("MuzzleFlashLocation");
         muzzleFlash = GameObject.FindObjectOfType<ParticleSystem>();
     }
 
     void Awake()
     {
-        DontDestroyOnLoad(particlesOBJ);
-        DontDestroyOnLoad(muzzleFlash);
+        //DontDestroyOnLoad(particlesOBJ);
+        //DontDestroyOnLoad(muzzleFlash);
         
         secondStageFirstLevel = false;
 
@@ -165,7 +166,7 @@ public class PlayerController : MonoBehaviour
 
         foreach(var pickupInstance in pickupInstances)
         {
-            Debug.Log(pickupInstance.name);
+            //Debug.Log(pickupInstance.name);
         }
 
         foreach(GameObject pickup in  pickupInstances)
@@ -181,7 +182,7 @@ public class PlayerController : MonoBehaviour
     
     private void Start()
     {
-        DontDestroyOnLoad(muzzleFlash);
+        //DontDestroyOnLoad(muzzleFlash);
         
         previousPlatformPosition = elevator.transform.Find("Collider").transform.position;
         magazineSize = magazine.GetComponent<MagazineSize>();
@@ -191,7 +192,7 @@ public class PlayerController : MonoBehaviour
         
         secondStretch.SetActive(false);
 
-        Debug.Log($"Gravity {Physics.gravity}");
+        //Debug.Log($"Gravity {Physics.gravity}");
 
         Time.timeScale = 1;
     }
@@ -220,8 +221,8 @@ public class PlayerController : MonoBehaviour
                 pickupParent = pickup;                
                 pickup.SetActive(true);
                 pointsToCollect = CountChildren(pickup);
-                Debug.Log($"CHILDREN: {pointsToCollect}");
-                Debug.Log(pickup.name + " has been set to active.");
+                //Debug.Log($"CHILDREN: {pointsToCollect}");
+                //Debug.Log(pickup.name + " has been set to active.");
                 SetCountText(pointsToCollect);
 
                 break;
@@ -271,7 +272,7 @@ public class PlayerController : MonoBehaviour
         
         
         speed = baseSpeed;
-        Debug.Log(speed);
+        //Debug.Log(speed);
         
         if (Input.GetKeyDown(KeyCode.Escape))
         {
@@ -291,7 +292,7 @@ public class PlayerController : MonoBehaviour
         if(isSprinting)
         {            
             speed = baseSpeed + sprintMod;
-            Debug.Log(speed);
+            //Debug.Log(speed);
         }
         if (Input.GetKeyDown(KeyCode.F) && slowTimeAvailable)
         {
@@ -332,16 +333,20 @@ public class PlayerController : MonoBehaviour
         }
         if (other.gameObject.CompareTag("PickUp"))
         {
-            Debug.Log("HIT TARGET");
+            //Debug.Log("HIT TARGET");
         }
         if (other.gameObject.CompareTag("Elevator"))
         {            
             continueText.SetActive(false);
-            Debug.Log("PARENTED TO ELEVATOR");
+            //Debug.Log("PARENTED TO ELEVATOR");
         }
         if (other.gameObject.CompareTag("Finish") && count == pointsToCollect)
         {
-            Debug.Log("DONE LEVEL");
+            if(UImanager != null)
+            {
+                UImanager.ShowScoreScreen();
+            }
+            
             finishedText.SetActive(true);            
             if(SceneManager.GetActiveScene().buildIndex + 1 < SceneManager.sceneCountInBuildSettings)
             {
@@ -359,7 +364,7 @@ public class PlayerController : MonoBehaviour
         if(other.gameObject.CompareTag("Elevator"))
         {
             transform.SetParent(null);            
-            Debug.Log("UNPARENTED TO ELEVATOR");
+            //Debug.Log("UNPARENTED TO ELEVATOR");
         }
               
     }
@@ -394,7 +399,7 @@ public class PlayerController : MonoBehaviour
         }
         catch(MissingReferenceException)
         {
-            Debug.Log("No PickUps in Scene");
+            //Debug.Log("No PickUps in Scene");
             return true;
         }        
     }
@@ -510,7 +515,7 @@ public class PlayerController : MonoBehaviour
         }
         catch(NullReferenceException)
         {
-            Debug.Log("NO OBJECT HIT");
+            //Debug.Log("NO OBJECT HIT");
         }
 
         

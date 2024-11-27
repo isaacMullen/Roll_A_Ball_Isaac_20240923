@@ -15,9 +15,9 @@ EditorBuildSettings:
     path: Assets/Scenes/InstructionScreen.unity
     guid: 036498a7b1cd9404a9e44f5241568fc4
   - enabled: 1
-    path: Assets/Scenes/MiniGame.unity
+    path: Assets/Scenes/levelOne.unity
     guid: 0fa9d0fabf9ddee4fa0056ee972accd2
   - enabled: 1
-    path: Assets/Scenes/MiniGameTwo.unity
+    path: Assets/Scenes/levelTwo.unity
     guid: b43cc6c1574d9444d8079884e48b2108
   m_configObjects: {}
