@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.SceneManagement;
+using UnityEditor;
+using Unity.VisualScripting;
 
 
 public class ScoreScreen : MonoBehaviour
@@ -14,14 +16,8 @@ public class ScoreScreen : MonoBehaviour
     
     public TextMeshProUGUI scoreText;
     public GameObject scorePanel;
-    public GameObject gamePanel;
-
-    // Start is called before the first frame update
-    private void Start()
-    {
-        
-    }
-
+    public GameObject gamePanel;    
+   
     private void OnEnable()
     {
         // Subscribe to the event
@@ -37,7 +33,7 @@ public class ScoreScreen : MonoBehaviour
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {                
         currentLevel = SceneManager.GetActiveScene().name;
-        Debug.Log($"Current Scene Name: {currentLevel}");
+        Debug.Log($"Current Scene Name: {currentLevel}");        
     }
 
     public void AdaptPerfectScore()
@@ -52,7 +48,7 @@ public class ScoreScreen : MonoBehaviour
         }
     }
 
-    public void ShowScoreScreen()
+    public void DetermineScore()
     {
         float time = playerController.timer;
 
@@ -60,33 +56,55 @@ public class ScoreScreen : MonoBehaviour
 
         if (time < currentLevelPerfect)
         {
-            Debug.Log("A+ Rating");
+            scoreText.SetText($"Time {time.ToString("F2")} | A+ Rating");
         }
         else if(time < currentLevelPerfect * 1.15f)
         {
-            Debug.Log("A Rating");
+            scoreText.SetText($"Time {time.ToString("F2")} | A Rating");
         }
         else if(time < currentLevelPerfect * 1.25f)
         {
-            Debug.Log("B Rating");
+            scoreText.SetText($"Time {time.ToString("F2")} | B Rating");
         }
         else if(time < currentLevelPerfect * 1.4f)
         {
-            Debug.Log("C Rating");
+            scoreText.SetText($"Time {time.ToString("F2")} | C Rating");
         }
         else if(time < currentLevelPerfect * 1.6f)
         {
-            Debug.Log("D Rating");
+            scoreText.SetText($"Time {time.ToString("F2")} | D Rating");
         }
         else
         {
-            Debug.Log("Yikes");
+            scoreText.SetText("Yikes");
         }
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
         
+
+        StartCoroutine(HandleScoreDisplay());
+    }   
+    
+    private IEnumerator HandleScoreDisplay()
+    {                
+        gamePanel.SetActive(false);
+        scorePanel.SetActive(true);
+
+        Time.timeScale = 0;
+
+        yield return new WaitUntil(() => Input.anyKeyDown);
+
+        
+        gamePanel.SetActive(true);
+        scorePanel.SetActive(false);
+
+        if (SceneManager.GetActiveScene().buildIndex + 1 < SceneManager.sceneCountInBuildSettings)
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+            Time.timeScale = 1f;
+        }
+        else
+        {
+            SceneManager.LoadScene(0);
+            Time.timeScale = 1f;
+        }
     }
 }

@@ -344,19 +344,10 @@ public class PlayerController : MonoBehaviour
         {
             if(UImanager != null)
             {
-                UImanager.ShowScoreScreen();
+                UImanager.DetermineScore();
             }
             
-            finishedText.SetActive(true);            
-            if(SceneManager.GetActiveScene().buildIndex + 1 < SceneManager.sceneCountInBuildSettings)
-            {
-                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
-            }
-            else
-            {
-                SceneManager.LoadScene(0);
-            }
-            
+            finishedText.SetActive(true);                                    
         }
     }
     private void OnTriggerExit(Collider other)
